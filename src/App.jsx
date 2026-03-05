@@ -1,107 +1,107 @@
 import { useState } from "react";
 
-const PRODUCTO_EJEMPLO = {
-  id: 1,
-  nombre: "Jurassic Park Beware",
-  precio: 25.0,
-  imagen: "https://via.placeholder.com/400x500", // Aquí pondrás tus fotos
-  categorias: ["Streetwear", "Movies"],
-};
+const PRODUCTOS = [
+  {
+    id: 1,
+    nombre: "Jurassic Park Edition",
+    precio: 25,
+    categoria: "Movies",
+    img: "https://via.placeholder.com/400x500",
+  },
+  {
+    id: 2,
+    nombre: "Anime Streetwear",
+    precio: 22,
+    categoria: "Anime",
+    img: "https://via.placeholder.com/400x500",
+  },
+];
 
-function App() {
-  const [pedido, setPedido] = useState({
+export default function App() {
+  const [carrito, setCarrito] = useState([]);
+  const [seleccion, setSeleccion] = useState({
     talla: "M",
     corte: "Regular",
     material: "Algodón",
     color: "Negro",
   });
 
-  const enviarPorCorreo = () => {
-    // Aquí es donde luego conectaremos EmailJS
-    const mensaje = `Nuevo Pedido:
-    Producto: ${PRODUCTO_EJEMPLO.nombre}
-    Talla: ${pedido.talla}
-    Corte: ${pedido.corte}
-    Material: ${pedido.material}
-    Color: ${pedido.color}
-    Total: $${PRODUCTO_EJEMPLO.precio}`;
-
-    alert("Datos listos para enviar:\n" + mensaje);
-    // Para probar rápido sin configurar nada, podrías usar mailto:
-    window.location.href = `mailto:tu-correo@gmail.com?subject=Nuevo Pedido&body=${encodeURIComponent(mensaje)}`;
+  const enviarPedido = () => {
+    const texto = carrito
+      .map((i) => `- ${i.nombre} (${i.talla}, ${i.corte}, ${i.color})`)
+      .join("\n");
+    window.location.href = `mailto:jason@ejemplo.com?subject=Pedido Sublimania&body=${encodeURIComponent("Mi pedido:\n" + texto)}`;
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 font-sans">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:flex">
-        {/* Imagen del Producto */}
-        <div className="md:w-1/2">
-          <img
-            className="h-full w-full object-cover"
-            src={PRODUCTO_EJEMPLO.imagen}
-            alt="Camisa"
-          />
+    <div className="min-h-screen bg-white text-black p-6 font-sans">
+      <header className="border-b-2 border-black pb-4 mb-8 flex justify-between items-center">
+        <h1 className="text-3xl font-black italic tracking-tighter">
+          SUBLIMANIA
+        </h1>
+        <span className="font-bold">CARRITO ({carrito.length})</span>
+      </header>
+
+      <main className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
+        <div className="bg-gray-200 aspect-square rounded-lg flex items-center justify-center text-gray-500 italic">
+          [ Foto del Producto ]
         </div>
 
-        {/* Detalles y Selectores */}
-        <div className="p-8 md:w-1/2">
-          <h1 className="text-2xl font-bold uppercase">
-            {PRODUCTO_EJEMPLO.nombre}
-          </h1>
-          <p className="text-xl text-gray-600 mt-2">
-            ${PRODUCTO_EJEMPLO.precio}.00
-          </p>
+        <div className="space-y-6">
+          <h2 className="text-4xl font-black uppercase italic">
+            {PRODUCTOS[0].nombre}
+          </h2>
+          <p className="text-2xl font-bold">$ {PRODUCTOS[0].precio}.00</p>
 
-          <div className="mt-6 space-y-4">
-            {/* Selector de Talla */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Talla
-              </label>
+              <label className="text-xs font-bold uppercase">Talla</label>
               <select
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 bg-gray-50"
+                className="w-full border-2 border-black p-2 mt-1"
                 onChange={(e) =>
-                  setPedido({ ...pedido, talla: e.target.value })
+                  setSeleccion({ ...seleccion, talla: e.target.value })
                 }
               >
-                {["S", "M", "L", "XL"].map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
               </select>
             </div>
-
-            {/* Selector de Corte */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Corte
-              </label>
-              <div className="flex gap-2 mt-1">
-                {["Slim Fit", "Regular", "Oversized"].map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setPedido({ ...pedido, corte: c })}
-                    className={`px-3 py-1 border rounded ${pedido.corte === c ? "bg-black text-white" : "bg-white"}`}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
+              <label className="text-xs font-bold uppercase">Corte</label>
+              <select
+                className="w-full border-2 border-black p-2 mt-1"
+                onChange={(e) =>
+                  setSeleccion({ ...seleccion, corte: e.target.value })
+                }
+              >
+                <option>Regular</option>
+                <option>Oversized</option>
+                <option>Slim Fit</option>
+              </select>
             </div>
-
-            {/* Botón de Compra */}
-            <button
-              onClick={enviarPorCorreo}
-              className="w-full mt-8 bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition"
-            >
-              REALIZAR PEDIDO
-            </button>
           </div>
+
+          <button
+            onClick={() =>
+              setCarrito([...carrito, { ...PRODUCTOS[0], ...seleccion }])
+            }
+            className="w-full bg-black text-white py-4 font-black hover:bg-gray-800 transition"
+          >
+            AÑADIR AL CARRITO
+          </button>
+
+          {carrito.length > 0 && (
+            <button
+              onClick={enviarPedido}
+              className="w-full border-2 border-black py-4 font-black text-sm"
+            >
+              FINALIZAR Y ENVIAR POR CORREO
+            </button>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
-
-export default App;
